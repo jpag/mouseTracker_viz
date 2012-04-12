@@ -1,0 +1,16 @@
+<html>
+<head>
+<script type="text/javascript" src="http://192.168.1.11:1337/socket.io/socket.io.js">    </script>
+<script>
+  var socket = io.connect('http://192.168.1.11:1337');
+  socket.on('news', function (data) {
+    console.log(data);
+    socket.emit('my other event', { my: 'data' });
+  });
+</script>
+</head>
+<body>
+
+</body>
+</html>
+
