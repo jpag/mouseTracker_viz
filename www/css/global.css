@@ -4,6 +4,7 @@
 body{
 	margin: 0px;
 	padding: 0px;
+	background-color: #F8F8F8;
 }
 
 #container{
@@ -12,4 +13,22 @@ body{
 	position: absolute;
 	top: 0px;
 	left: 0px;	
+	background: #FFFFFF;
+}
+
+
+.follow{
+	width: 25px;
+	height: 25px;
+	position: absolute;
+	background-color: #888888;
+	
+	top: 20px;
+	left: 20px;
+	
+	
+	-webkit-border-radius: 10px;
+	-moz-border-radius: 10px;
+	border-radius: 10px;
+
 }
