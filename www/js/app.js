@@ -5,7 +5,29 @@ var listOfFollowers = [];
 var heightOfFollower = 48;
 var widthOfFollower = 48;
 
+var canvasH = 1080;
+var canvasW = 1920;
 
+
+var canvas = new Object();
+	canvas.w = 1920;
+	canvas.h = 1080;
+	canvas.ctx;
+	canvas.init = function(){
+		$('body').append('<canvas id="canvas-draw" width="'+canvasW+'" height="'+canvasH+'"></canvas>');
+		//get a reference to the canvas
+		canvas.ctx = $('#canvas-draw')[0].getContext("2d");
+	}
+	
+	canvas.drawPoint = function(data){
+		
+		canvas.ctx.fillStyle = data.color;
+		canvas.ctx.beginPath();
+		canvas.ctx.arc(data.x, data.y, 10, 0, Math.PI*2, true); 
+		canvas.ctx.closePath();
+		canvas.ctx.fill();
+	}
+	
 
 var c = new Object();
 
@@ -14,9 +36,8 @@ c.address = '192.168.1.11';
 c.id = 0;
 
 c.init = function(){
-	
 	$.getScript("http://"+c.address+":"+c.port+"/socket.io/socket.io.js" , c.socketScriptComplete );
-	
+	canvas.init();
 }
 c.socketScriptComplete = function(){
 
@@ -59,6 +80,12 @@ c.updateFollower = function(data){
 	
 	$( "#f"+data.id ).css({ left:coords[0], top:coords[1] });
 	
+	
+	canvas.drawPoint({
+						color:data.color, 
+						x:coors[0], 
+						y:coords[1]
+					});
 }
 
 c.setupFollower = function(data){
