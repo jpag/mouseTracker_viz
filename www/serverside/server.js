@@ -40,11 +40,11 @@ var server = net.createServer(function (connection) {
 	
 	connection.on('data', function(data) {
     	//trace(data);
-	    //sending data via socket io, to port 1337
+	    //sending data via socket io, to HTML clients port 1337
     	io.sockets.emit('appEvent', { coordinates:data , id: id , color:connection.color });
 	});
 	
-	c.on('end', function() {
+	connection.on('end', function(data) {
 		for(var s=0; s < apps_connected.length ; s++ ){
 			if( apps_connected[s] == connection ){
 				apps_connected.splice(s,1);
@@ -53,7 +53,7 @@ var server = net.createServer(function (connection) {
 				break;
 			}
 		}
-	}
+	});
 
 });
 

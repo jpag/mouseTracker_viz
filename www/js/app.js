@@ -51,12 +51,13 @@ c.socketScriptComplete = function(){
 c.updateFollower = function(data){
 
 	var coords = data.coordinates.split("," );
-	trace('id ' + data.id + ' ' + coords[0] +' - ' + coords[1] );
+	//trace('id ' + data.id + ' ' + coords[0] +' - ' + coords[1] );
+	
 	//var divid = "f"+data.id.toString();
 	//trace( divid );
 	//trace( $(divid) );
 	
-	$( "#f"+data.id ).css({ left:coords[0]+"px", top:coords[1] });
+	$( "#f"+data.id ).css({ left:coords[0], top:coords[1] });
 	
 }
 
