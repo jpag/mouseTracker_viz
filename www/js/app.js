@@ -43,6 +43,9 @@ c.socketScriptComplete = function(){
 	  //socket.emit('htmlCallback', { my: 'data' });
 	});
 		
+	socket.on('appDisconnect' , function(data){
+		c.removeFollower(data);
+	});	
 }
 
 c.updateFollower = function(data){
@@ -69,7 +72,19 @@ c.setupFollower = function(data){
 	listOfFollowers.push({id:id_val , color:colorVal});
 };
 
-
+c.removeFollower = function(data){
+	
+	$("#f"+data.id).remove();
+	
+	for( var f=0; f < listOfFollowers.length; f++ ){
+		if( data.id == listOfFollowers[f].id ){
+			listOfFollowers.splice(f,1);
+			trace(' ---- successfully removed follower');
+		}
+	}
+	
+	
+};
 
 
 
