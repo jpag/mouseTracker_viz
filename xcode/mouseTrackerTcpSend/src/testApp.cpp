@@ -64,7 +64,7 @@ void testApp::update(){
 		deltaTime = ofGetElapsedTimeMillis() - connectTime;
 
 		if( deltaTime > 5000 ){
-			weConnected = tcpClient.setup("192.168.1.11", 1338);
+			weConnected = tcpClient.setup("192.168.1.12", 1338);
 			connectTime = ofGetElapsedTimeMillis();
 		}
 
