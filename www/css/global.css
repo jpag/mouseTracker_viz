@@ -4,7 +4,8 @@
 body{
 	margin: 0px;
 	padding: 0px;
-	background-color: #F8F8F8;
+	background-color: #E8E8E8;
+	overflow: hidden;
 }
 
 #container{
@@ -27,8 +28,39 @@ body{
 	left: 20px;
 	
 	
-	-webkit-border-radius: 10px;
-	-moz-border-radius: 10px;
-	border-radius: 10px;
+	-webkit-border-radius: 12px;
+	-moz-border-radius: 12px;
+	border-radius: 12px;
 
 }
+
+
+/* set the width height of layers */
+#visualizeContainer, #followerContainer, #canvas-draw{
+	width: 1920px;
+	height: 1080px;
+}
+
+#visualizeContainer{
+	position: relative;
+	margin: auto;
+	border: 1px solid #C0C0C0;
+}
+#followerContainer, #canvas-draw{
+	position: absolute;
+	top: 0px;
+	left: 0px;
+}
+#canvas-draw{
+	background-color: #FFFFFF;
+}
+
+
+/* @group zindex */
+	#canvas-draw{
+		z-index: 110;
+	}
+	#followerContainer{
+		z-index: 120;	
+	}
+/* @end */

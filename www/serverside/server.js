@@ -2,6 +2,8 @@
 var address = '192.168.1.12';
 
 var io = require('socket.io').listen(1337, address );
+	io.set('log level', 1); // reduce logging
+	
 var net = require('net');
 var fs = require('fs');
 var apps_connected = [];
@@ -11,6 +13,8 @@ var colors = ["#bbd100" , "#45d697" , "#45c7d6" , "#3d81ff" , "#8f3dff" , "#ff3d
 
 //-----HTML clients
 io.sockets.on('connection', function (socket) {
+	trace(' html client connected ' );
+	
   socket.emit('data', { event: 'connect' });
   socket.on('htmlCallback', function (data) {
     //trace(data);
@@ -28,8 +32,13 @@ var serverclient = net.createServer(function (connection) {
   	
 	connection.id = id;
 	
-	var cid = Math.round( Math.random()*colors.length );
-	if( cid > (colors.length-1) ){ cid = 0; };
+	//var cid = Math.round( Math.random()*colors.length );
+	//if( cid > (colors.length-1) ){ cid = 0; };
+	var cid = app_index;
+	if( app_index >= colors.length ){
+		cid = Math.round(app_index/colors.length)-1;
+	}
+	
 	connection.color = colors[ cid ];
 	
 	trace( id + ' color picked ' + connection.color );
@@ -58,7 +67,7 @@ var serverclient = net.createServer(function (connection) {
 });
 
 //server listens to 1338, waiting for data from app
-serverclient.listen(1338, address);
+serverclient.listen(1338, address );
 
 
 function trace(str){try{console.log(str)}catch(e){};}

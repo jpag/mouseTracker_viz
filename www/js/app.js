@@ -14,25 +14,38 @@ var canvas = new Object();
 	canvas.h = 1080;
 	canvas.ctx;
 	canvas.init = function(){
-		$('body').append('<canvas id="canvas-draw" width="'+canvasW+'" height="'+canvasH+'"></canvas>');
+		$('#visualizeContainer').append('<canvas id="canvas-draw" width="'+canvasW+'" height="'+canvasH+'"></canvas>');
 		//get a reference to the canvas
 		canvas.ctx = $('#canvas-draw')[0].getContext("2d");
 	}
 	
 	canvas.drawPoint = function(data){
 		
+		//canvas.fadePreviousData();
+		
 		canvas.ctx.fillStyle = data.color;
 		canvas.ctx.beginPath();
-		canvas.ctx.arc(data.x, data.y, 10, 0, Math.PI*2, true); 
+		canvas.ctx.arc(data.x, data.y, 5, 0, Math.PI*2, true); 
 		canvas.ctx.closePath();
 		canvas.ctx.fill();
 	}
 	
+	canvas.fadePreviousData = function(){
+		//http://beej.us/blog/data/html5s-canvas-2-pixel/
+		
+		 // get all canvas pixel data
+		    canvas.ctx.globalAlpha = canvas.ctx.globalAlpha * .9;
+		    var imageData = canvas.ctx.getImageData(0, 0, canvas.w, canvas.h);
+			canvas.ctx.globalAlpha = 1;
+			
+		// put pixel data on canvas
+		    //canvas.ctx.putImageData(imageData, 0, 0);
+	}
 
 var c = new Object();
 
 c.port = '1337';
-c.address = '192.168.1.11';
+c.address = '192.168.1.12';
 c.id = 0;
 
 c.init = function(){
@@ -83,7 +96,7 @@ c.updateFollower = function(data){
 	
 	canvas.drawPoint({
 						color:data.color, 
-						x:coors[0], 
+						x:coords[0], 
 						y:coords[1]
 					});
 }
