@@ -1,5 +1,5 @@
 //io listens for 1337, waiting for html
-var address = '192.168.1.11';
+var address = '192.168.1.12';
 
 var io = require('socket.io').listen(1337, address );
 var net = require('net');
@@ -22,7 +22,7 @@ io.sockets.on('connection', function (socket) {
 
 
 //-----APP clients
-var server = net.createServer(function (connection) {
+var serverclient = net.createServer(function (connection) {
 	app_index++;
 	var id = app_index;
   	
@@ -58,7 +58,7 @@ var server = net.createServer(function (connection) {
 });
 
 //server listens to 1338, waiting for data from app
-server.listen(1338, address);
+serverclient.listen(1338, address);
 
 
 function trace(str){try{console.log(str)}catch(e){};}
