@@ -90,11 +90,18 @@ var serverclient = net.createServer(function (connection) {
 	    
 	    var _name = 'undefined';
 	    if( datasplit.length > 3 ){
-	    	trace( datasplit );
+	    	//trace( datasplit );
 	    	_name = datasplit[3];
 	    }
 	    
-    	io.sockets.emit('appEvent', { coordinates:data , id: id , color:connection.color , radius:_r , alpha:_a , name:_name });
+	    var _color = connection.color; //default for older apps.
+	    if( datasplit.length > 4 ){
+	    	_color = datasplit[4];
+	    }
+	    
+	    //trace(' length of data object ' + datasplit.length )
+	    
+    	io.sockets.emit('appEvent', { coordinates:data , id: id , color:_color , radius:_r , alpha:_a , name:_name });
     	
     	//store previous content if needed on next update...
     	connection.coords = datasplit;
