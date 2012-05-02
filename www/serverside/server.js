@@ -1,6 +1,8 @@
 //io listens for 1337, waiting for html
 var address = '192.168.1.12';
 
+var appBuild = 0.1;
+
 var io = require('socket.io').listen(1337, address );
 	io.set('log level', 1); // reduce logging
 	
@@ -15,6 +17,8 @@ var maxRadius = 50;//50;
 var defaultAlpha = 1;//1;
 var minAlpha = 1;//25;
 var maxAlpha = 150;
+
+
 
 //-----HTML clients
 io.sockets.on('connection', function (socket) {
@@ -45,10 +49,9 @@ var serverclient = net.createServer(function (connection) {
 	}
 	
 	connection.color = colors[ cid ];
-	connection.coords = [0,0];
+	connection.coordinates = {"x":.5 , "y":.5 }; //start at center point
 	connection.r = defaultRadius;
 	connection.alpha = defaultAlpha;
-	
 	
 	trace( id + ' color picked ' + connection.color + ' ' + connection.alpha );
 	
@@ -57,58 +60,73 @@ var serverclient = net.createServer(function (connection) {
 	connection.setEncoding("ascii");
 	
 	connection.on('data', function(data) {
-    	//trace(data);
-	    //sending data via socket io, to HTML clients port 1337
-	    var _r = defaultRadius;
-	    var _a = defaultAlpha;
-	    
-	    var datasplit = data.split("," );
-	    if( appClient.determineMinimalMovement(datasplit[0],connection.coords[0]) && 
-	    	appClient.determineMinimalMovement(datasplit[1],connection.coords[1]) ){
-	    	
-	    	//enlarge radius.	
-	    	_r = connection.r+((maxRadius-connection.r)*.0008) //r*1.01;
-	    	//lower alpha
-	    	_a = connection.alpha + ((maxAlpha-connection.alpha)*.0005);
-	    	
-	    }else{
-	    	//_r = connection.r*.1;
-	    }
-	    
-	    //check max / min values
-	    if( _r > maxRadius ){
-	    	_r = maxRadius;
-	    }else if( _r < defaultRadius ){
-	    	_r = defaultRadius;
-	    }
-	    	
-	    if( _a < minAlpha ){
-	    	_a = minAlpha;
-	    }else if( _a > maxAlpha ){
-	    	_a = maxAlpha;
-	    }
-	    
-	    var _name = 'undefined';
-	    if( datasplit.length > 3 ){
-	    	//trace( datasplit );
-	    	_name = datasplit[3];
-	    }
-	    
-	    var _color = connection.color; //default for older apps.
-	    if( datasplit.length > 4 ){
-	    	_color = datasplit[4];
-	    }
-	    
-	    //trace(' length of data object ' + datasplit.length )
-	    
-    	io.sockets.emit('appEvent', { coordinates:data , id: id , color:_color , radius:_r , alpha:_a , name:_name });
+    	//data array list:
     	
-    	//store previous content if needed on next update...
-    	connection.coords = datasplit;
-    	connection.r = _r;
-    	connection.alpha = _a;
+    	var datasplit = data.split("," );
     	
-
+    	if( datasplit[appClient.indexBuild] == appBuild ){
+    	
+	    	//trace(data);
+		    //sending data via socket io, to HTML clients port 1337
+		    var _r = defaultRadius;
+		    var _a = defaultAlpha;
+		    
+		    var _x = parseFloat(datasplit[appClient.indexX]);
+		    var _y = parseFloat(datasplit[appClient.indexY]);
+		    
+		    //if HAS NO MOVEMENT:
+		    if( appClient.determineMinimalMovement(_x,connection.coordinates.x) && 
+		    	appClient.determineMinimalMovement(_y,connection.coordinates.y) ){
+		    	//enlarge radius.	
+		    	_r = connection.r+((maxRadius-connection.r)*.0008) //r*1.01;
+		    	//lower alpha
+		    	_a = connection.alpha + ((maxAlpha-connection.alpha)*.0005);
+		    }else{
+		    	//_r = connection.r*.1;
+		    }
+		    
+		    //check max / min values
+		    if( _r > maxRadius ){
+		    	_r = maxRadius;
+		    }else if( _r < defaultRadius ){
+		    	_r = defaultRadius;
+		    }
+		    	
+		    if( _a < minAlpha ){
+		    	_a = minAlpha;
+		    }else if( _a > maxAlpha ){
+		    	_a = maxAlpha;
+		    }
+		    
+		    var _name = 'anonymous';
+		    if( datasplit.length > appClient.indexName ){
+		    	_name = datasplit[appClient.indexName];
+		    }
+		    
+		    var _color = connection.color; //default for older apps.
+		    if( datasplit.length > appClient.indexColor ){
+		    	_color = datasplit[appClient.indexColor];
+		    }
+		    
+	    	io.sockets.emit('appEvent', { coordinates:{
+	    												'x':_x,
+	    												'y':_y
+	    												}, 
+											id:id, 
+											color:_color, 
+											radius:_r, 
+											alpha:_a, 
+											name:_name 
+											});
+	    	
+	    	
+	    	//store previous content if needed on next update...
+	    	connection.coordinates = {'x':_x,'y':_y };
+	    	connection.r = _r;
+	    	connection.alpha = _a;
+		}else{
+			//trace(' not a valid app Build number current: ' + appBuild + ' has : ' + datasplit[appClient.indexBuild] );
+		}    	
 	});
 	
 	connection.on('end', function(data) {
@@ -129,17 +147,23 @@ serverclient.listen(1338, address );
 
 
 var appClient = new Object();
-
+	
+	//APP Client sends a comma sep string that needs to be split translated to an array of data with the following indexes:
+	//  version/build, coordinateX, coordinateY, name(str), colorval(str - 6 digit hex no hash )
+	appClient.indexBuild = 0;
+	appClient.indexX = 1;
+	appClient.indexY = 2;
+	appClient.indexName = 3;
+	appClient.indexColor = 4;
+	
+	
 	appClient.determineMinimalMovement = function(current,previous){
-
 		var marginOfError = 5;
 		var _dif = false;
-		
 		//if( ((previous-marginOfError)<current) && (current<(previous+marginOfError))  ){
 		if( previous == current ){
 			_dif = true; 
 		}
-		
 		return _dif;
 	}
 

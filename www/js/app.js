@@ -39,6 +39,13 @@ var canvas = new Object();
 		col[1] += parseInt(amt);
 		col[2] += parseInt(amt);
 		
+		for( var c=0;c<col.length;c++){
+			//max RGB value scale of 0-255;
+			if( col[c] > 255 ){
+				col[c] = 255;
+			}
+		}
+		
 		return col;
 	}
 	
@@ -48,24 +55,20 @@ var canvas = new Object();
 		//trace( canvas.ctx.globalAlpha );
 		
 		var color = toRGB( data.color.toString() );
-			//color = [ Math.round(Math.random()*250) , Math.round(Math.random()*250) , Math.round(Math.random()*250) ];
+		//color = [ Math.round(Math.random()*250) , Math.round(Math.random()*250) , Math.round(Math.random()*250) ];
 		//var colorval = 'rgba('+canvas.lighten(color[0],data.alpha)+','+canvas.lighten(color[1],data.alpha)+','+canvas.lighten(color[2],data.alpha)+',1)';
-		
 		//var colorval = '#'+canvas.lighten( data.color , data.alpha );
-		var colorLight = canvas.lighten(color , data.alpha);
 		
+		var colorLight = canvas.lighten(color , data.alpha);
 		var colorval = 'rgb('+colorLight[0]+','+colorLight[1]+','+colorLight[2]+');';
 		
-			//colorval = 'rgba(187,209,0,.001)';
-			//colorval = '#'+data.color.toString();
-		
-		
-		if( increment > 2000 && increment < 2100 ){
+		if( increment > 500 && increment < 700 ){
+			trace( data );
 			//trace( data.color.toString() );
 			//trace( data.alpha  );
 			//trace( color );
-			//trace( colorval );
-			//trace( ' ---- ' );
+			trace( colorval );
+			trace( ' ---- ' );
 		}
 		increment++;
 		
@@ -116,8 +119,8 @@ var canvas = new Object();
 		var qx = mx + cradius * Math.cos(angle);
 		var qy = my + cradius * Math.sin(angle);
 		
-		canvas.ctx.quadraticCurveTo(qx, qy, to.x, to.y);  
-		//canvas.ctx.lineTo(to.x,to.y); 
+		//canvas.ctx.quadraticCurveTo(qx, qy, to.x, to.y);  
+		canvas.ctx.lineTo(to.x,to.y); 
 		canvas.ctx.stroke();
 		
 	}
@@ -223,17 +226,27 @@ c.updateFollower = function(data , previous){
 	var _x = data.x - heightOfFollower * .5;
 	var _y = data.y - widthOfFollower *  .5;
 	
+	
 	$( "#f"+data.id ).css({ left:_x, top:_y });
 	if( data.name != 'undefined' ){
 		$( "#f"+data.id+" .name").html(data.name);
-	}	
+	}
+	$("#f"+data.id+' .followIcon').css({"background-color" : data.color });	
 }
 
 c.splitIncomingNodeData = function(data){
-	var appVariables = data.coordinates.split("," );
+	//var appVariables = data.coordinates.split("," );
 	
-	var _y = parseInt(appVariables[1]);
-	var _x = parseInt(appVariables[0]);
+	var _y = data.coordinates.y;	//parseFloat(appVariables[1]);
+	var _x = data.coordinates.x;	//parseFloat(appVariables[0]);
+	
+	//accomodate old and new apis
+	if( _x <= 1 ){
+		 _x = Math.round(_x * canvas.w);
+	}
+	if( _y <= 1 ){
+		_y = Math.round(_y * canvas.h);
+	}
 	
 	var name = data.name;//.split("↵");///some number shows up after the ↵ sign?
 	
